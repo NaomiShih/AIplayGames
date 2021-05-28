@@ -6,7 +6,7 @@ Created on Thu May 20 14:35:15 2021
 """
 
 import pygame
-from pygame.locals import*
+from pygame.locals import *
 import time
 import random
 from playsound import playsound
@@ -55,7 +55,7 @@ screen = pygame.display.set_mode((width, height))#設定螢幕長寬
 pygame.display.set_caption('小朋友下樓梯')#設定視窗名稱
 
 
-
+RectFlag = 0
 
 lef = 0#判斷往左兩個動作的參數
 rig = 0#判斷往右兩個動作的參數
@@ -72,24 +72,27 @@ count2 = 0
 # 渲染方法會回傳 surface 物件
 
 # blit 用來把其他元素渲染到另外一個 surface 上，這邊是 window 視窗
-
+global tmpHP
 
 
 class player:
-    def __init__(self, X, Y, HP, img):
+    def __init__(self, X, Y, HP, img, tmpHP):
         self.X = X
         self.Y = Y
         self.HP = HP
         self.img = img
-        
+        self.tmpHP = tmpHP
     
 
 
     def player_fall(player):
         player.Y += 1
         
-    def player_stop_fall(player):
-        player.Y -= 1.5
+    def player_stop_fall(player, CountF):
+        if CountF < 50:
+            player.Y -= 1.5
+        else:
+            player.Y -= 1.8
     def player_stop_float(player):
         player.Y += 11
 
@@ -102,8 +105,12 @@ class Platform:
         self.Y = Y
         self.dmg = dmg
         self.img = img    
-    def Platform_float(Board):
-        Board.Y -= 0.5
+    def Platform_float(Board, CountF):
+        if CountF < 50:
+            Board.Y -= 0.5
+        else:
+            Board.Y -= 0.8
+        
         if Board.Y < 100:
         
             Board.X = random.randint(0, 350)
@@ -114,13 +121,22 @@ class Platform:
         player.X += 0.5
     def Platform_left(self, player):
         player.X -= 0.5
-    def Platform_Rect(Platform, Player, PlatWidth, PlatHigth, PlayerWidth, PlayerHight):
+    def Platform_Rect(Platform, Player, PlatWidth, PlatHigth, PlayerWidth, PlayerHight, CountF):
         PlatformRect  = pygame.Rect(Platform.X, Platform.Y , PlatWidth, PlatHigth)
         PlayerRect    = pygame.Rect(Player.X, Player.Y, PlayerWidth, PlayerHight)
         if (pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1 and Platform.img == ImgList['ceil'] ):
             player.player_stop_float(Player)
+            RectFlag = 1
+            return RectFlag
         elif(pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1):
-            player.player_stop_fall(Player)
+            
+            player.player_stop_fall(Player, CountF)
+            RectFlag = 1
+            
+            if Player.tmpHP == Player.HP:
+            
+                Player.HP -= Platform.dmg
+               # print('碰到板子 被扣了' + str(Platform.dmg) + '血量')
             
             if (Platform.img == ImgList['TrampolineUP']):
                 Platform.Platform_bounce(Player)
@@ -129,10 +145,14 @@ class Platform:
                 
             if(Platform.img == ImgList['conveyor_left']):
                 Platform.Platform_left(Player)
-    def SetPlatform(times, platformtime, platform):#幾秒要生成 BOARDTIME 板子生成時間
+        elif(pygame.Rect.colliderect(PlayerRect, PlatformRect) != 1):
+             Player.tmpHP = Player.HP
+             #print('離開板子 血量重製')
+             #print(Player.HP, Player.tmpHP)
+    def SetPlatform(times, platformtime, platform, CountF):#幾秒要生成 BOARDTIME 板子生成時間
         if (platformtime > times):
             screen.blit(platform.img, (platform.X, platform.Y))
-            Platform.Platform_float(platform)
+            Platform.Platform_float(platform, CountF)
         
             
         
@@ -144,35 +164,33 @@ for i in range(0, 100, 1):
     X = random.randint(30, 365)
     Xlist.append(X)
 
-player1 = player(240, 120, 12,ImgList['player'] )
+player1 = player(240, 120, 12,ImgList['player'], 12 )
 RandX = random.randint(0, 99)
 
 
-Board1  = Platform(Xlist[count], 600, 0, ImgList['Board'] )
-count += 1
-Nails1   = Platform(Xlist[count], 600, 0,ImgList['Nails'] )
-count += 1
-Board2  = Platform(Xlist[count], 600, 0, ImgList['Board'] )
-count += 1
-Trampoline  = Platform(Xlist[count], 600, 0, ImgList['TrampolineUP'] )
-count += 1
-ceil = Platform(20, 80, 0, ImgList['ceil'] )
-count += 1
-conveyor_left = Platform(Xlist[count], 600, 0, ImgList['conveyor_left'] )
-count += 1
-conveyor_right = Platform(Xlist[count], 600, 0, ImgList['conveyor_right'] )
-count += 1
+Board1  = Platform(Xlist[0], 600, -1, ImgList['Board'] )
+Nails1   = Platform(Xlist[4], 600, 5,ImgList['Nails'] )
+Nails2   = Platform(Xlist[2], 600, 5,ImgList['Nails'] )
+Nails3   = Platform(Xlist[7], 600, 5,ImgList['Nails'] )
+Nails4   = Platform(Xlist[5], 600, 5,ImgList['Nails'] )
+Board2  = Platform(Xlist[3], 600, -1, ImgList['Board'] )
+Trampoline  = Platform(Xlist[6], 600, -1, ImgList['TrampolineUP'] )
+ceil = Platform(20, 80, 5, ImgList['ceil'] )
+conveyor_left = Platform(Xlist[5], 600, -1, ImgList['conveyor_left'] )
+conveyor_right = Platform(Xlist[6], 600, -1, ImgList['conveyor_right'] )
 
 
+timeflag = 0
 tcount =0
 HPflag = 1
+timebios = []
 
 while 1:
     
     ##環境設定
     
     screen.fill((0, 0, 0))#把畫布塗黑
-    print(player1.HP)
+    #print(player1.HP)
     
     platformtime = pygame.time.get_ticks()#設定一個計時器 單位為毫秒
     times = platformtime % 2500#計時器每2.5秒歸0
@@ -204,7 +222,7 @@ while 1:
     player.player_fall(player1)
     
     playerRect  = pygame.Rect(player1.X, player1.Y, 20, 31)#畫出PLAYER1的碰撞範圍
-    Platform.Platform_Rect(ceil, player1, 480, 32, 20, 31)
+    Platform.Platform_Rect(ceil, player1, 480, 32, 20, 31, CountF)
    
  
     WallRect  = pygame.Rect(0, 80, 18, 560)
@@ -218,34 +236,46 @@ while 1:
          
          player1.X  -= 8
     
+      
+    if timeflag == 0:
+        
+        timerand = random.randint(500, 5000 )
+        for x in range(0, 10, 1):
+            timebiosrand = random.randint(0, 15000 )
+            timebios.append(timebiosrand)
+        timeflag = 1
     
-  
-   
-
-    Platform.SetPlatform(0 , platformtime,Board1 )
-    Platform.Platform_Rect(Board1, player1, 94, 1, 20, 31)
+    Platform.SetPlatform(0 , platformtime,Board1, CountF)
+    Platform.Platform_Rect(Board1, player1, 94, 1, 20, 31, CountF)
     
-    Platform.SetPlatform(1000 , platformtime,Trampoline )#設定彈簧
-    Platform.Platform_Rect(Trampoline, player1, 95, 1, 20, 31)
+    Platform.SetPlatform(timerand + timebios[0] , platformtime,Trampoline, CountF)#設定彈簧
+    Platform.Platform_Rect(Trampoline, player1, 95, 1, 20, 31, CountF)
     #Platform.Platform_bounce(player1)
-    Platform.SetPlatform(1500, platformtime, conveyor_left)
-    Platform.Platform_Rect(conveyor_left, player1, 95, 1, 20, 31)
-    Platform.SetPlatform(2500 , platformtime,Board2 )
-    Platform.Platform_Rect(Board2, player1, 94, 1, 20, 31)
+    Platform.SetPlatform(timerand + timebios[1], platformtime, conveyor_left, CountF)
+    Platform.Platform_Rect(conveyor_left, player1, 95, 1, 20, 31, CountF)
+    Platform.SetPlatform(timerand + timebios[2] , platformtime,Board2 , CountF)
+    Platform.Platform_Rect(Board2, player1, 94, 1, 20, 31, CountF)
 
-    Platform.SetPlatform(500 , platformtime,Nails1 )
-    Platform.Platform_Rect(Nails1, player1, 95, 1, 20, 31)
+    Platform.SetPlatform(timerand + timebios[3] , platformtime,Nails1, CountF )
+    Platform.Platform_Rect(Nails1, player1, 95, 1, 20, 31, CountF)
     
-    Platform.SetPlatform(3250, platformtime, conveyor_right)
-    Platform.Platform_Rect(conveyor_right, player1, 95, 1, 20, 31)
-    
-  
-    
+    Platform.SetPlatform(timerand + timebios[4], platformtime, conveyor_right, CountF)
+    Platform.Platform_Rect(conveyor_right, player1, 95, 1, 20, 31, CountF)
+    if (CountF > 20):
+         Platform.SetPlatform(timerand + timebios[5] , platformtime,Nails2 , CountF)
+         Platform.Platform_Rect(Nails2, player1, 95, 1, 20, 31, CountF)
+    if (CountF > 30):
 
-                
-            
+         Platform.SetPlatform(timerand + timebios[6] , platformtime,Nails3, CountF )
+         Platform.Platform_Rect(Nails3, player1, 95, 1, 20, 31, CountF)     
+    if (CountF > 50):
+
+         Platform.SetPlatform(timerand + timebios[7] , platformtime,Nails4, CountF )
+         Platform.Platform_Rect(Nails4, player1, 95, 1, 20, 31, CountF) 
+                   
   
     pygame.display.flip()#環境更新
+
 
 
     #操控角色    
@@ -254,14 +284,65 @@ while 1:
             
            
             exit(0)       
-
-        if event.type == pygame.KEYDOWN:#左
+    key_p = pygame.key.get_pressed()
+    if (key_p[pygame.K_LEFT]):
+        print('press left')
+        keys[2]=True
+    else:
+        keys[2]=False
+        
+    if (key_p[pygame.K_RIGHT]):
+        print('press right')
+        keys[3]=True
+    else:
+        keys[3]=False
+    
+    if keys[2] or keys[3] == False:
+        player1.img = ImgList['Normal']
+        
+    '''  
+    if event.type == pygame.KEYUP:
             if event.key==K_LEFT:
+                keys[2]=False
+               
+                player1.img = ImgList['Normal']
+                
+    if event.type == pygame.KEYUP:
+            if event.key==K_RIGHT:
+                keys[3]=False
+                
+                player1.img = ImgList['Normal']
+      '''
+        
+    if keys[2] == True and lef % 2 == 0: #兩張跑步圖片 
+        player1.img = ImgList['LEFT1']
+        player1.X -= 1
+        lef += 1
+    elif keys[2] == True and lef % 2 == 1: 
+        player1.img = ImgList['LEFT2']
+        player1.X -= 1
+        lef += 1
+        
+    elif keys[3] == True and rig % 2 == 0:
+        player1.img = ImgList['RIGHT1']
+        player1.X  += 1
+        rig += 1 
+    elif keys[3] == True and rig % 2 == 1: 
+        player1.img = ImgList['RIGHT2']
+        player1.X += 1
+        rig += 1
+     
+        
+'''
+        if event.type == pygame.key.get_pressed():#左
+            if event.key==pygame.K_LEFT:
+                print('press left')
                 keys[2]=True
                 keys[3]=False
-                        
-        if event.type == pygame.KEYDOWN:#右
-            if event.key==K_RIGHT:
+                       
+        if event.type == pygame.key.get_pressed():#右
+            if event.key==pygame.K_RIGHT:
+                print('press right')
                 keys[3]=True
                 keys[2]=False
     
@@ -269,27 +350,10 @@ while 1:
             keys[3]=False
             keys[2]=False
             player1.img = ImgList['Normal']
-                           
+      '''                     
             
-        if keys[2] == True and lef % 2 == 0: #兩張跑步圖片 
-            player1.img = ImgList['LEFT1']
-            player1.X -= 8
-            lef += 1
-        elif keys[2] == True and lef % 2 == 1: 
-            player1.img = ImgList['LEFT2']
-            player1.X -= 8
-            lef += 1
-        
-        elif keys[3] == True and rig % 2 == 0:
-            player1.img = ImgList['RIGHT1']
-            player1.X  += 8
-            rig += 1 
-        elif keys[3] == True and rig % 2 == 1: 
-            player1.img = ImgList['RIGHT2']
-            player1.X += 8
-            rig += 1
-
-       
+    
+   
     
     
 

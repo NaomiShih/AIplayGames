@@ -153,7 +153,6 @@ class Platform:
             
             if (Platform.img == ImgList['TrampolineUP']):
                 global jump,PY
-                print('on Trampoline')
                 jump=1
                 PY = Platform.Y
                 

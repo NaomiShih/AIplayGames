@@ -96,7 +96,7 @@ class player:
     def player_stop_float(player):
         player.Y += 11
     
-    def player_jump(player):
+    def player_jump(player, CountF):
         global jump,PY
         if player.Y < (PY-130):
             jump = 0
@@ -106,7 +106,10 @@ class player:
             jump = 0
             
         else:
-            player.Y -= 0.7
+            if CountF < 50:
+                player.Y -= 0.7
+            else:
+                player.Y -= 1.1
         
 
 
@@ -126,186 +129,47 @@ class Platform:
             Board.X = random.randint(114,366)
             Board.Y = random.randint(740,1240)
             
-            if (Board == Board1) :
-                if (Board.Y - Board2.Y < 20) or ((Board.X - Board2.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change1')
-                elif (Board.Y - Nails1.Y < 35) or ((Board.X - Nails1.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change1')
-                elif (Board.Y - Trampoline.Y < 23) or ((Board.X - Trampoline.X)**2 < 9409):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change1')
-                elif (Board.Y - conveyor_left.Y < 20) or ((Board.X - conveyor_left.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change1')
-                elif (Board.Y - conveyor_right.Y < 20) or ((Board.X - conveyor_right.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change1')
-                
-                    
-            elif (Board == Board2) :
-                if (Board.Y - Board1.Y < 20) or ((Board.X - Board1.X)**2 < 9216) :
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change2')
-                elif (Board.Y - Nails1.Y < 35) or ((Board.X - Nails1.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change2')
-                elif (Board.Y - Trampoline.Y < 23) or ((Board.X - Trampoline.X)**2 < 9409):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change2')
-                elif (Board.Y - conveyor_left.Y < 20) or ((Board.X - conveyor_left.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change2')
-                elif (Board.Y - conveyor_right.Y < 20) or ((Board.X - conveyor_right.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change2')
-                
-            elif Board == Nails1:
-                if (Board.Y - Board1.Y < 20) or ((Board.X - Board1.X)**2 < 9216) :
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change3')
-                elif (Board.Y - Board2.Y < 20) or ((Board.X - Board2.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change3')
-                elif (Board.Y - Nails2.Y < 35) or ((Board.X - Nails2.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change3')
-                elif (Board.Y - Trampoline.Y < 23) or ((Board.X - Trampoline.X)**2 < 9409):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change3')
-                elif (Board.Y - conveyor_left.Y < 20) or ((Board.X - conveyor_left.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change3')
-                elif (Board.Y - conveyor_right.Y < 20) or ((Board.X - conveyor_right.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change3')
-                    
-            elif Board == Nails2:
-                if (Board.Y - Board1.Y < 20) or ((Board.X - Board1.X)**2 < 9216) :
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change4')
-                elif (Board.Y - Board2.Y < 20) or ((Board.X - Board2.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change4')
-                elif (Board.Y - Nails1.Y < 35) or ((Board.X - Nails1.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change4')
-                elif (Board.Y - Trampoline.Y < 23) or ((Board.X - Trampoline.X)**2 < 9409):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change4')
-                elif (Board.Y - conveyor_left.Y < 20) or ((Board.X - conveyor_left.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change4')
-                elif (Board.Y - conveyor_right.Y < 20) or ((Board.X - conveyor_right.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change4')
+            Board1Rect  = pygame.Rect(Board1.X, Board1.Y, 95, 16)
+            Board2Rect  = pygame.Rect(Board2.X, Board2.Y, 95, 16)
+            Nails1Rect  = pygame.Rect(Nails1.X, Nails1.Y, 95, 31)
             
+            BoardYlist = [Board1.Y,Board2.Y,Nails1.Y,Nails2.Y,Nails3.Y,Nails4.Y,Trampoline.Y,conveyor_left.Y,conveyor_right.Y]
+            for i in BoardYlist[1:]:
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:1]+BoardYlist[2:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:2]+BoardYlist[3:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:3]+BoardYlist[4:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:4]+BoardYlist[5:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:5]+BoardYlist[6:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:6]+BoardYlist[7:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:7]+BoardYlist[8:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
+                    
+            for i in (BoardYlist[:8]+BoardYlist[9:]):
+                if (Board.Y-i)**2 < 1225:
+                    Board.Y += 30
             
-                    
-                    
-            elif Board.img == TrampolineUP:
-                if (Board.Y - Board1.Y < 20) or ((Board.X - Board1.X)**2 < 9216) :
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change7')
-                elif (Board.Y - Board2.Y < 20) or ((Board.X - Board2.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change7')
-                elif (Board.Y - Nails1.Y < 35) or ((Board.X - Nails1.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change7')
-                elif (Board.Y - Nails2.Y < 35) or ((Board.X - Nails2.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change7')
-                elif (Board.Y - conveyor_left.Y < 20) or ((Board.X - conveyor_left.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change7')
-                elif (Board.Y - conveyor_right.Y < 20) or ((Board.X - conveyor_right.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change7')
-                    
-            elif Board == conveyor_left:      
-                if (Board.Y - Board1.Y < 20) or ((Board.X - Board1.X)**2 < 9216) :
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change8')
-                elif (Board.Y - Board2.Y < 20) or ((Board.X - Board2.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change8')
-                elif (Board.Y - Nails1.Y < 35) or ((Board.X - Nails1.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change8')
-                elif (Board.Y - Nails2.Y < 35) or ((Board.X - Nails2.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change8')
-                elif (Board.Y - Trampoline.Y < 23) or ((Board.X - Trampoline.X)**2 < 9409):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change8')
-                elif (Board.Y - conveyor_right.Y < 20) or ((Board.X - conveyor_right.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change8')
-                    
-            elif Board == conveyor_right:
-                if (Board.Y - Board1.Y < 20) or ((Board.X - Board1.X)**2 < 9216) :
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change9')
-                elif (Board.Y - Board2.Y < 20) or ((Board.X - Board2.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change9')
-                elif (Board.Y - Nails1.Y < 35) or ((Board.X - Nails1.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change9')
-                elif (Board.Y - Nails2.Y < 35) or ((Board.X - Nails2.X)**2 < 9409):
-                    Board.Y += 50
-                    Board.X = random.randint(114,366)
-                    print('change9')
-                elif (Board.Y - Trampoline.Y < 23) or ((Board.X - Trampoline.X)**2 < 9409):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change9')
-                elif (Board.Y - conveyor_left.Y < 20) or ((Board.X - conveyor_left.X)**2 < 9216):
-                    Board.Y += 30
-                    Board.X = random.randint(114,366)
-                    print('change9')
-                
-            
-
 
     def Platform_right(self, player):
         player.X += 0.3
@@ -372,12 +236,12 @@ RandX = random.randint(0, 99)
 
 
 Board1  = Platform(240, 600, -1, ImgList['Board'] )
-Nails1   = Platform(Xlist[4], 600*2, 5,ImgList['Nails'] )
+Nails1   = Platform(Xlist[4], 800, 5,ImgList['Nails'] )
 Nails2   = Platform(Xlist[2], 600*2, 5,ImgList['Nails'] )
 Nails3   = Platform(Xlist[7], 600*2, 5,ImgList['Nails'] )
 Nails4   = Platform(Xlist[5], 600*2, 5,ImgList['Nails'] )
 Board2  = Platform(Xlist[3], 800, -1, ImgList['Board'] )
-Trampoline  = Platform(Xlist[6], 740, -1, ImgList['TrampolineUP'] )
+Trampoline  = Platform(Xlist[6], 900, -1, ImgList['TrampolineUP'] )
 ceil = Platform(20, 80, 5, ImgList['ceil'] )
 conveyor_left = Platform(Xlist[5], 600*2, -1, ImgList['conveyor_left'] )
 conveyor_right = Platform(Xlist[6], 600*2, -1, ImgList['conveyor_right'] )
@@ -423,13 +287,13 @@ while 1:
     
     
     if jump == 1:
-        player.player_jump(player1)
+        player.player_jump(player1, CountF)
         
     else:
         player.player_fall(player1)
     
-    playerRect  = pygame.Rect(player1.X, player1.Y, 20, 31)#畫出PLAYER1的碰撞範圍
-    Platform.Platform_Rect(ceil, player1, 480, 32, 20, 31, CountF)
+    playerRect  = pygame.Rect(player1.X, player1.Y, 31, 31)#畫出PLAYER1的碰撞範圍
+    Platform.Platform_Rect(ceil, player1, 480, 32, 31, 31, CountF)
    
  
     WallRect  = pygame.Rect(0, 80, 18, 560)
@@ -453,31 +317,31 @@ while 1:
         timeflag = 1
 
     Platform.SetPlatform(0 , platformtime,Board1, CountF)
-    Platform.Platform_Rect(Board1, player1, 94, 1, 20, 31, CountF)
+    Platform.Platform_Rect(Board1, player1, 94, 1, 31, 31, CountF)
     
-    Platform.SetPlatform(1500 , platformtime,Trampoline, CountF)#設定彈簧
-    Platform.Platform_Rect(Trampoline, player1, 95, 1, 20, 31, CountF)
+    Platform.SetPlatform(1900 , platformtime,Trampoline, CountF)#設定彈簧
+    Platform.Platform_Rect(Trampoline, player1, 95, 1, 31, 31, CountF)
     Platform.SetPlatform(timerand + timebios[1], platformtime, conveyor_left, CountF)
-    Platform.Platform_Rect(conveyor_left, player1, 95, 1, 20, 31, CountF)
+    Platform.Platform_Rect(conveyor_left, player1, 95, 1, 31, 31, CountF)
     Platform.SetPlatform(1000 , platformtime,Board2 , CountF)
-    Platform.Platform_Rect(Board2, player1, 94, 1, 20, 31, CountF)
+    Platform.Platform_Rect(Board2, player1, 94, 1, 31, 31, CountF)
 
-    Platform.SetPlatform(timerand + timebios[3] , platformtime,Nails1, CountF )
-    Platform.Platform_Rect(Nails1, player1, 95, 1, 20, 31, CountF)
+    Platform.SetPlatform(1500 , platformtime,Nails1, CountF )
+    Platform.Platform_Rect(Nails1, player1, 95, 1, 31, 31, CountF)
     
     Platform.SetPlatform(timerand + timebios[4], platformtime, conveyor_right, CountF)
-    Platform.Platform_Rect(conveyor_right, player1, 95, 1, 20, 31, CountF)
+    Platform.Platform_Rect(conveyor_right, player1, 95, 1, 31, 31, CountF)
     if (CountF > 20):
          Platform.SetPlatform(timerand + timebios[5] , platformtime,Nails2 , CountF)
-         Platform.Platform_Rect(Nails2, player1, 95, 1, 20, 31, CountF)
+         Platform.Platform_Rect(Nails2, player1, 95, 1, 31, 31, CountF)
     if (CountF > 30):
 
          Platform.SetPlatform(timerand + timebios[6] , platformtime,Nails3, CountF )
-         Platform.Platform_Rect(Nails3, player1, 95, 1, 20, 31, CountF)     
+         Platform.Platform_Rect(Nails3, player1, 95, 1, 31, 31, CountF)     
     if (CountF > 50):
 
          Platform.SetPlatform(timerand + timebios[7] , platformtime,Nails4, CountF )
-         Platform.Platform_Rect(Nails4, player1, 95, 1, 20, 31, CountF) 
+         Platform.Platform_Rect(Nails4, player1, 95, 1, 31, 31, CountF) 
                    
   
     pygame.display.flip()#環境更新

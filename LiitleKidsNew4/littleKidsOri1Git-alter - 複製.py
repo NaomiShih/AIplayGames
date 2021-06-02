@@ -129,45 +129,42 @@ class Platform:
             Board.X = random.randint(114,366)
             Board.Y = random.randint(740,1240)
             
-            Board1Rect  = pygame.Rect(Board1.X, Board1.Y, 95, 16)
-            Board2Rect  = pygame.Rect(Board2.X, Board2.Y, 95, 16)
-            Nails1Rect  = pygame.Rect(Nails1.X, Nails1.Y, 95, 31)
             
             BoardYlist = [Board1.Y,Board2.Y,Nails1.Y,Nails2.Y,Nails3.Y,Nails4.Y,Trampoline.Y,conveyor_left.Y,conveyor_right.Y]
             for i in BoardYlist[1:]:
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:1]+BoardYlist[2:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:2]+BoardYlist[3:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:3]+BoardYlist[4:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:4]+BoardYlist[5:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:5]+BoardYlist[6:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:6]+BoardYlist[7:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:7]+BoardYlist[8:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:8]+BoardYlist[9:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
             
 
@@ -219,11 +216,6 @@ class Platform:
     def Platform_damage(Board, player):
         pass
         
-class Colliderect_platform(Platform):
-    def colliderect_board(self):
-        BoardRect = pygame.Rect(0, 80, 18, 560)
-        if (super.Platform.img == ImgList['TrampolineUP']):
-            super.PlatformRect
 
     
   
@@ -321,7 +313,7 @@ while 1:
     
     Platform.SetPlatform(1900 , platformtime,Trampoline, CountF)#設定彈簧
     Platform.Platform_Rect(Trampoline, player1, 95, 1, 31, 31, CountF)
-    Platform.SetPlatform(timerand + timebios[1], platformtime, conveyor_left, CountF)
+    Platform.SetPlatform(500, platformtime, conveyor_left, CountF)
     Platform.Platform_Rect(conveyor_left, player1, 95, 1, 31, 31, CountF)
     Platform.SetPlatform(1000 , platformtime,Board2 , CountF)
     Platform.Platform_Rect(Board2, player1, 94, 1, 31, 31, CountF)

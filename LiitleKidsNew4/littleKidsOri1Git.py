@@ -31,9 +31,8 @@ pygame.display.set_caption('小朋友下樓梯')#設定視窗名稱
 
 
 RectFlag = 0
-
-lef = 0#判斷往左兩個動作的參數
-rig = 0#判斷往右兩個動作的參數
+HPJudge = [True]
+CeilJudge = [False]
 keys =  [False, False, False, False]#設定上下左右判定的list
 CountF = 0#設定往下樓層的變數
 
@@ -48,18 +47,17 @@ walkCount = 0
 # 渲染方法會回傳 surface 物件
 
 # blit 用來把其他元素渲染到另外一個 surface 上，這邊是 window 視窗
-global tmpHP, jump, PY
+global tmpHP, jump, PY, run
 PY = 0 #platform Y值
 jump = 0 #彈跳開關
 
 
 class player:
-    def __init__(self, X, Y, HP, img, tmpHP, vel):
+    def __init__(self, X, Y, HP, img, vel):
         self.X = X
         self.Y = Y
         self.HP = HP
         self.img = img
-        self.tmpHP = tmpHP
         self.vel = vel
     
 
@@ -138,86 +136,104 @@ class Platform:
             Board.X = random.randint(114,366)
             Board.Y = random.randint(740,1240)
             
-            Board1Rect  = pygame.Rect(Board1.X, Board1.Y, 95, 16)
-            Board2Rect  = pygame.Rect(Board2.X, Board2.Y, 95, 16)
-            Nails1Rect  = pygame.Rect(Nails1.X, Nails1.Y, 95, 31)
-            
-            BoardYlist = [Board1.Y,Board2.Y,Nails1.Y,Nails2.Y,Nails3.Y,Nails4.Y,Trampoline.Y,conveyor_left.Y,conveyor_right.Y]
+            BoardYlist = [Board1.Y,Board2.Y,Board3.Y,Nails1.Y,Nails2.Y,Nails3.Y,Nails4.Y,Trampoline.Y,conveyor_left.Y,conveyor_right.Y]
             for i in BoardYlist[1:]:
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:1]+BoardYlist[2:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:2]+BoardYlist[3:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:3]+BoardYlist[4:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:4]+BoardYlist[5:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:5]+BoardYlist[6:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:6]+BoardYlist[7:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:7]+BoardYlist[8:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
                     
             for i in (BoardYlist[:8]+BoardYlist[9:]):
-                if (Board.Y-i)**2 < 1225:
+                if (Board.Y-i)**2 < 1400:
+                    Board.Y += 30
+            
+            for i in (BoardYlist[:9]+BoardYlist[10:]):
+                if (Board.Y-i)**2 < 1400:
                     Board.Y += 30
             
 
     def Platform_right(self, player):
-        player.X += 0.3
+        player.X += player.vel-0.2
     def Platform_left(self, player):
-        player.X -= 0.3
+        player.X -= player.vel-0.2
     def Platform_Rect(Platform, Player, PlatWidth, PlatHigth, PlayerWidth, PlayerHight, CountF):
         PlatformRect  = pygame.Rect(Platform.X, Platform.Y , PlatWidth, PlatHigth)
         PlayerRect    = pygame.Rect(Player.X, Player.Y, PlayerWidth, PlayerHight)
         if (pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1 and Platform.img == KidImg.ceil):
             player.player_stop_float(Player)
+           
             RectFlag = 1
             return RectFlag
         
-
-        
-        elif(pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1) and (Player.Y+PlayerHight)>Platform.Y:
+        elif (pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1)and(Platform.img == KidImg.TrampolineUP):
+            global jump,PY, run
+            jump=1
+            PY = Platform.Y
             
-            player.player_stop_fall(Player, CountF)
-            RectFlag = 1
-            
-            if Player.tmpHP == Player.HP:
-            
+            if HPJudge[0]:
                 Player.HP -= Platform.dmg
+                if Player.HP > 10:
+                    Player.HP = 10
+                    
+                elif Player.HP == 0:
+                    playsound('./assets/sounds/Stabbed Scream.mp3', block=True)
+                    run = False
+                print(f'被扣了{Platform.dmg} 血量')
+                HPJudge[0] = False
+          
+         
+        elif(pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1) :
+            Player.Y = Platform.Y-29
+            #player.player_stop_fall(Player, CountF)
+            RectFlag = 1
+            if HPJudge[0]:
+                Player.HP -= Platform.dmg
+                if Player.HP > 10:
+                    Player.HP = 10
+                elif Player.HP <= 0:
+                    playsound('./assets/sounds/Stabbed Scream.mp3', block=True)
+                    run = False
+                print(f'被扣了{Platform.dmg} 血量')
+                HPJudge[0] = False
+          
                # print('碰到板子 被扣了' + str(Platform.dmg) + '血量')
             
-            if (Platform.img == KidImg.TrampolineUP):
-                global jump,PY
-                jump=1
-                PY = Platform.Y
+            
                 
             if(Platform.img == KidImg.conveyor_right):
                 Platform.Platform_right(Player)
                 
             if(Platform.img == KidImg.conveyor_left):
                 Platform.Platform_left(Player)
-        elif(pygame.Rect.colliderect(PlayerRect, PlatformRect) != 1):
-             Player.tmpHP = Player.HP
-             #print('離開板子 血量重製')
-             #print(Player.HP, Player.tmpHP)
+        
+
+           
     def SetPlatform(times, platformtime, platform, CountF):#幾秒要生成 BOARDTIME 板子生成時間
         if (platformtime > times):
             screen.blit(platform.img, (platform.X, platform.Y))
@@ -228,11 +244,6 @@ class Platform:
     def Platform_damage(Board, player):
         pass
         
-class Colliderect_platform(Platform):
-    def colliderect_board(self):
-        BoardRect = pygame.Rect(0, 80, 18, 560)
-        if (super.Platform.img == KidImg.TrampolineUP):
-            super.PlatformRect
 
     
   
@@ -240,19 +251,20 @@ for i in range(0, 100, 1):
     X = random.randint(30, 365)
     Xlist.append(X)
 
-player1 = player(240, 120, 12,KidImg.player, 12, 0.5 )
+player1 = player(240, 120, 10,KidImg.player,0.5 )
 RandX = random.randint(0, 99)
 
 
 Board1  = Platform(240, 600, -1, KidImg.Board)
-Nails1   = Platform(Xlist[4], 800, 5,KidImg.Nails )
-Nails2   = Platform(Xlist[2], 600*2, 5,KidImg.Nails )
-Nails3   = Platform(Xlist[7], 600*2, 5,KidImg.Nails )
-Nails4   = Platform(Xlist[5], 600*2, 5,KidImg.Nails )
+Nails1   = Platform(Xlist[4], 800, 3,KidImg.Nails )
+Nails2   = Platform(Xlist[2], random.randint(1100, 1200), 3,KidImg.Nails )
+Nails3   = Platform(Xlist[7], random.randint(1100, 1200), 3,KidImg.Nails )
+Nails4   = Platform(Xlist[5], random.randint(1100, 1200), 3,KidImg.Nails )
 Board2  = Platform(Xlist[3], 800, -1, KidImg.Board )
+Board3  = Platform(Xlist[3], 1300, -1, KidImg.Board)
 Trampoline  = Platform(Xlist[6], 900, -1, KidImg.TrampolineUP)
 ceil = Platform(20, 80, 5,  KidImg.ceil )
-conveyor_left = Platform(Xlist[5], 600*2, -1,  KidImg.conveyor_left)
+conveyor_left = Platform(Xlist[5], 700, -1,  KidImg.conveyor_left)
 conveyor_right = Platform(Xlist[6], 600*2, -1,  KidImg.conveyor_right )
 
 
@@ -263,10 +275,10 @@ timebios = []
 run = True
 
 
-while run:
+while run:#主迴圈
     
     ##環境設定
-    
+      #playsound('./assets/sounds/Spring 1.mp3', block=True)
     screen.fill((0, 0, 0))#把畫布塗黑
     #print(player1.HP)
     
@@ -294,12 +306,33 @@ while run:
     screen.blit(player1.img, (player1.X, player1.Y))#設定玩家
     screen.blit( KidImg.ceil,  (20, 80))
     screen.blit( KidImg.ceil,  (55, 80))
-    screen.blit( KidImg.life,  (10, 0))
-    
-    
+    #screen.blit( KidImg.life,  (10, 0))
+    if player1.HP == 10:
+        screen.blit( KidImg.life,  (10, 0))
+    elif player1.HP == 9:
+        screen.blit( KidImg.life1,  (10, 0))
+    elif player1.HP == 8:
+        screen.blit( KidImg.life2,  (10, 0))
+    elif player1.HP == 7:
+        screen.blit( KidImg.life3,  (10, 0))
+    elif player1.HP == 6:
+        screen.blit( KidImg.life4,  (10, 0))
+    elif player1.HP == 5:
+        screen.blit( KidImg.life5,  (10, 0))
+    elif player1.HP == 4:
+        screen.blit( KidImg.life6,  (10, 0))
+    elif player1.HP == 3:
+        screen.blit( KidImg.life7,  (10, 0))
+    elif player1.HP == 2:
+        screen.blit( KidImg.life8,  (10, 0))
+    elif player1.HP == 1:
+        screen.blit( KidImg.life9,  (10, 0))
+    elif player1.HP == 1:
+        screen.blit( KidImg.life10,  (10, 0))
     
     if jump == 1:
         player.player_jump(player1, CountF)
+        
         
     else:
         player.player_fall(player1)
@@ -314,10 +347,10 @@ while run:
     
     if (pygame.Rect.colliderect(playerRect, WallRect) == 1 ):
         
-         player1.X  += 8
+         player1.X  += player1.vel
     if (pygame.Rect.colliderect(playerRect, WallRect2) == 1 ):
          
-         player1.X  -= 8
+         player1.X  -= player1.vel
     
       
     if timeflag == 0:
@@ -333,10 +366,13 @@ while run:
     
     Platform.SetPlatform(1900 , platformtime,Trampoline, CountF)#設定彈簧
     Platform.Platform_Rect(Trampoline, player1, 95, 1, 31, 31, CountF)
-    Platform.SetPlatform(timerand + timebios[1], platformtime, conveyor_left, CountF)
+    Platform.SetPlatform(500, platformtime, conveyor_left, CountF)
     Platform.Platform_Rect(conveyor_left, player1, 95, 1, 31, 31, CountF)
     Platform.SetPlatform(1000 , platformtime,Board2 , CountF)
     Platform.Platform_Rect(Board2, player1, 94, 1, 31, 31, CountF)
+    
+    Platform.SetPlatform(2000 , platformtime,Board3 , CountF)
+    Platform.Platform_Rect(Board3, player1, 94, 1, 31, 31, CountF)
 
     Platform.SetPlatform(1500 , platformtime,Nails1, CountF )
     Platform.Platform_Rect(Nails1, player1, 95, 1, 31, 31, CountF)
@@ -355,9 +391,36 @@ while run:
          Platform.SetPlatform(timerand + timebios[7] , platformtime,Nails4, CountF )
          Platform.Platform_Rect(Nails4, player1, 95, 1, 31, 31, CountF) 
                    
-  
-    pygame.display.flip()#環境更新
-
+    
+    PlayerRect    = pygame.Rect(player1.X, player1.Y, 31, 31)
+    Board1Rect    = pygame.Rect(Board1.X, Board1.Y , 94, 1)
+    Board2Rect    = pygame.Rect(Board2.X, Board2.Y , 94, 1)
+    Board3Rect    = pygame.Rect(Board3.X, Board3.Y , 94, 1)
+    TrampolineRect   = pygame.Rect(Trampoline.X, Trampoline.Y , 95, 1)
+    conveyor_leftRect    = pygame.Rect(conveyor_left.X, conveyor_left.Y , 94, 1)
+    conveyor_rightRect    = pygame.Rect( conveyor_right.X,  conveyor_right.Y , 94, 1)
+    Nails1Rect    = pygame.Rect(Nails1.X, Nails1.Y , 94, 1)
+    Nails2Rect    = pygame.Rect(Nails2.X, Nails2.Y , 94, 1)
+    Nails3Rect    = pygame.Rect(Nails3.X, Nails3.Y , 94, 1)
+    Nails4Rect    = pygame.Rect(Nails4.X, Nails4.Y , 94, 1)
+    CeilRect      = pygame.Rect(ceil.X, ceil.Y , 480, 32)
+    a = pygame.Rect.colliderect(PlayerRect,  Board1Rect) 
+    b = pygame.Rect.colliderect(PlayerRect,  Board2Rect) 
+    c = pygame.Rect.colliderect(PlayerRect,  Board3Rect)
+    d = pygame.Rect.colliderect(PlayerRect, TrampolineRect) 
+    e = pygame.Rect.colliderect(PlayerRect, conveyor_leftRect) 
+    f = pygame.Rect.colliderect(PlayerRect, conveyor_rightRect) 
+    g = pygame.Rect.colliderect(PlayerRect, Nails1Rect) 
+    h = pygame.Rect.colliderect(PlayerRect,  Nails2Rect) 
+    i = pygame.Rect.colliderect(PlayerRect, Nails3Rect) 
+    j = pygame.Rect.colliderect(PlayerRect, Nails4Rect) 
+    k = pygame.Rect.colliderect(PlayerRect, CeilRect) 
+    #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
+    if not(a or b or c or d or e or f or g or h or i or j or k):
+        HPJudge[0] = True
+    print (HPJudge[0])
+    pygame.display.flip()#環境更新尖刺2{h} 尖刺3{i}
+    print (player1.HP)
 
 
     #操控角色    

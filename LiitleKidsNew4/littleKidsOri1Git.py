@@ -135,7 +135,7 @@ class Platform:
         if CountF < 50:
             Board.Y -= 0.5
         else:
-            Board.Y -= 0.8
+            Board.Y -= 0.7
         
         if Board.Y < 100 or Board.Y > 1240:       
             Board.X = random.randint(114,366)

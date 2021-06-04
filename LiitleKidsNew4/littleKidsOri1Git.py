@@ -426,9 +426,9 @@ while run:
     #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
     if not(a or b or c or d or e or f or g or h or i or j):
         HPJudge[0] = True
-    print (HPJudge[0])
+  
     pygame.display.flip()#環境更新尖刺2{h} 尖刺3{i}
-    print (player1.HP)
+
          
   
 

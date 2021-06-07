@@ -26,7 +26,7 @@ walkLeft  = [pygame.image.load('./assets/playerL1.png'), pygame.image.load('./as
 pygame.init()
 pygame.mixer.init()
 
-FPS = 30#設定幀數
+FPS = 100#設定幀數
 width, height = 480, 640 #把螢幕長寬變數丟進去
 screen = pygame.display.set_mode((width, height))#設定螢幕長寬
 pygame.display.set_caption('小朋友下樓梯')#設定視窗名稱
@@ -252,7 +252,6 @@ class GameState(player, Platform):
         self.loopIter = 0
         self.CountF = 0     
         self.walkCount = 0
-        self.jump = self.PY = 0
         self.HPJudge = [True]
         
         self.player1 = player(240, 120, 10,KidImg.player, 0.5 )
@@ -275,6 +274,7 @@ class GameState(player, Platform):
      
     
     def frame_step(self, input_actions):
+        global jump,PY
         pygame.event.pump()
         
         screen.fill((0, 0, 0))
@@ -291,7 +291,7 @@ class GameState(player, Platform):
         if input_actions[1] == 1:
             self.player1.X -= self.player1.vel
             
-        elif input_actions[0] == 1:
+        elif input_actions[2] == 1:
             self.player1.X += self.player1.vel
             
         platformtime = pygame.time.get_ticks()#設定一個計時器 單位為毫秒
@@ -312,7 +312,7 @@ class GameState(player, Platform):
         self.loopIter = (self.loopIter + 1) % 30
         
         head_font = pygame.font.SysFont(None, 60)#設定大小60的標題框框
-        text_surface = head_font.render('B%04dF'%CountF, True, (121, 255, 121))#設定標題的字跟顏色
+        text_surface = head_font.render('B%04dF'%self.CountF, True, (121, 255, 121))#設定標題的字跟顏色
         screen.blit(text_surface, (300, 25))#讓標題印在畫布300,25的地方
     # 5 - clear the screen before drawing it again
     #screen.fill((0, 0, 0))
@@ -351,7 +351,7 @@ class GameState(player, Platform):
             Terminal = True
             self.__init__()
     
-        if self.jump == 1:
+        if jump == 1:
             player.player_jump(self.player1, self.CountF)
         
         else:
@@ -435,13 +435,13 @@ class GameState(player, Platform):
         #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
         if not(a or b or c or d or e or f or g or h or i or j):
             self.HPJudge[0] = True
-      
-        pygame.display.flip()#環境更新尖刺2{h} 尖刺3{i}
         
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())
-        pygame.display.update()
-        FPSCLOCK.tick(FPS)
-        #print self.upperPipes[0]['y'] + PIPE_HEIGHT - int(BASEY * 0.2)
+        pygame.display.flip()#環境更新尖刺2{h} 尖刺3{i}
+        
+        #image_data = pygame.surfarray.array3d(pygame.display.get_surface())
+        #pygame.display.update()
+        #FPSCLOCK.tick(FPS)
         return image_data, reward, terminal
 
      

@@ -26,11 +26,12 @@ walkLeft  = [pygame.image.load('./assets/playerL1.png'), pygame.image.load('./as
 pygame.init()
 pygame.mixer.init()
 
-FPS = 100#設定幀數
+FPS = 3000#設定幀數
+FPSCLOCK = pygame.time.Clock()
 width, height = 480, 640 #把螢幕長寬變數丟進去
 screen = pygame.display.set_mode((width, height))#設定螢幕長寬
 pygame.display.set_caption('小朋友下樓梯')#設定視窗名稱
-FPSCLOCK = pygame.time.Clock()
+
 
 HPJudge = [True]
 keys =  [False, False, False, False]#設定上下左右判定的list
@@ -436,12 +437,10 @@ class GameState(player, Platform):
         if not(a or b or c or d or e or f or g or h or i or j):
             self.HPJudge[0] = True
         
-        image_data = pygame.surfarray.array3d(pygame.display.get_surface())
-        pygame.display.flip()#環境更新尖刺2{h} 尖刺3{i}
         
-        #image_data = pygame.surfarray.array3d(pygame.display.get_surface())
-        #pygame.display.update()
-        #FPSCLOCK.tick(FPS)
+        image_data = pygame.surfarray.array3d(pygame.display.get_surface())
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
         return image_data, reward, terminal
 
      

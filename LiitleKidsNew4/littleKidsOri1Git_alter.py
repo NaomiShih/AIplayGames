@@ -26,7 +26,7 @@ walkLeft  = [pygame.image.load('./assets/playerL1.png'), pygame.image.load('./as
 pygame.init()
 pygame.mixer.init()
 
-FPS = 3000#設定幀數
+FPS = 300#設定幀數
 FPSCLOCK = pygame.time.Clock()
 width, height = 480, 640 #把螢幕長寬變數丟進去
 screen = pygame.display.set_mode((width, height))#設定螢幕長寬
@@ -41,7 +41,7 @@ Xlist  = []#紀錄每個X值
 
 walkCount = 0
 
-global tmpHP, jump, PY,run
+global jump, PY,run
 PY = 0 #platform Y值
 jump = 0 #彈跳開關
 PLAYER_INDEX_GEN = cycle([0, 1, 2, 1])
@@ -127,7 +127,7 @@ class Platform:
         self.Y = Y
         self.dmg = dmg
         self.img = img    
-    def Platform_float(Board, CountF):
+    def Platform_float(Board,CountF,Board1,Board2,Board3,Nails1,Nails2,Nails3,Nails4,Trampoline,conveyor_left,conveyor_right):
         if CountF < 50:
             Board.Y -= 0.5
         else:
@@ -240,10 +240,10 @@ class Platform:
                 elif ((Player.X+PlayerWidth/2) < (Platform.X+PlatWidth/2)) and ((Player.X+0.8*PlayerWidth)>Platform.X):
                     Platform.Platform_left(Player)
         
-    def SetPlatform(times, platformtime, platform, CountF):#幾秒要生成 BOARDTIME 板子生成時間
+    def SetPlatform(times, platformtime, platform, CountF,Board1,Board2,Board3,Nails1,Nails2,Nails3,Nails4,Trampoline,conveyor_left,conveyor_right):#幾秒要生成 BOARDTIME 板子生成時間
         if (platformtime > times):
             screen.blit(platform.img, (platform.X, platform.Y))
-            Platform.Platform_float(platform, CountF)
+            Platform.Platform_float(platform, CountF,Board1,Board2,Board3,Nails1,Nails2,Nails3,Nails4,Trampoline,conveyor_left,conveyor_right)
         
 
 class GameState(player, Platform):
@@ -379,34 +379,34 @@ class GameState(player, Platform):
         
 
         
-        Platform.SetPlatform(0 , platformtime,self.Board1, self.CountF)
+        Platform.SetPlatform(0 , platformtime,self.Board1, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
         Platform.Platform_Rect(self.Board1, self.player1, 94, 1, 31, 31, self.CountF)
         
-        Platform.SetPlatform(1900 , platformtime,self.Trampoline, self.CountF)#設定彈簧
+        Platform.SetPlatform(1900 , platformtime,self.Trampoline, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)#設定彈簧
         Platform.Platform_Rect(self.Trampoline, self.player1, 95, 1, 31, 31, self.CountF)
-        Platform.SetPlatform(500, platformtime, self.conveyor_left, self.CountF)
+        Platform.SetPlatform(500, platformtime, self.conveyor_left, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
         Platform.Platform_Rect(self.conveyor_left, self.player1, 95, 1, 31, 31, self.CountF)
-        Platform.SetPlatform(1200 , platformtime,self.Board2 , self.CountF)
+        Platform.SetPlatform(1200 , platformtime,self.Board2 , self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
         Platform.Platform_Rect(self.Board2, self.player1, 94, 1, 31, 31, self.CountF)
         
-        Platform.SetPlatform(2400 , platformtime,self.Board3 , self.CountF)
+        Platform.SetPlatform(2400 , platformtime,self.Board3 , self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
         Platform.Platform_Rect(self.Board3, self.player1, 94, 1, 31, 31, self.CountF)
     
-        Platform.SetPlatform(1500 , platformtime,self.Nails1, self.CountF )
+        Platform.SetPlatform(1500 , platformtime,self.Nails1, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right )
         Platform.Platform_Rect(self.Nails1, self.player1, 95, 1, 31, 31, self.CountF)
         
-        Platform.SetPlatform(timerand + timebios[4], platformtime, self.conveyor_right, self.CountF)
+        Platform.SetPlatform(timerand + timebios[4], platformtime, self.conveyor_right, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
         Platform.Platform_Rect(self.conveyor_right, self.player1, 95, 1, 31, 31, self.CountF)
         if (self.CountF > 20):
-             Platform.SetPlatform(timerand + timebios[5] , platformtime,self.Nails2 , self.CountF)
+             Platform.SetPlatform(timerand + timebios[5] , platformtime,self.Nails2 , self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
              Platform.Platform_Rect(self.Nails2, self.player1, 95, 1, 31, 31, self.CountF)
         if (self.CountF > 30):
     
-             Platform.SetPlatform(timerand + timebios[6] , platformtime,self.Nails3, self.CountF )
+             Platform.SetPlatform(timerand + timebios[6] , platformtime,self.Nails3, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right )
              Platform.Platform_Rect(self.Nails3, self.player1, 95, 1, 31, 31, self.CountF)     
         if (self.CountF > 50):
     
-             Platform.SetPlatform(timerand + timebios[7] , platformtime,self.Nails4, self.CountF )
+             Platform.SetPlatform(timerand + timebios[7] , platformtime,self.Nails4, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right )
              Platform.Platform_Rect(self.Nails4, self.player1, 95, 1, 31, 31, self.CountF)
              
         
@@ -449,17 +449,17 @@ class GameState(player, Platform):
 for i in range(0, 100, 1):           
     X = random.randint(30, 365)
     Xlist.append(X)
-
+'''
 player1 = player(240, 120, 10,KidImg.player, 0.5 )
 
 
-Board1  = Platform(240, 600, -1, KidImg.Board)
-Nails1   = Platform(Xlist[4], 1241, 3,KidImg.Nails )
-Nails2   = Platform(Xlist[2], 1241, 3,KidImg.Nails )
+#Board1  = Platform(240, 600, -1, KidImg.Board)
+#Nails1   = Platform(Xlist[4], 1241, 3,KidImg.Nails )
+#Nails2   = Platform(Xlist[2], 1241, 3,KidImg.Nails )
 Nails3   = Platform(Xlist[7], 1241, 3,KidImg.Nails )
 Nails4   = Platform(Xlist[5], 1241, 3,KidImg.Nails )
-Board2  = Platform(Xlist[3], 1241, -1, KidImg.Board )
-Board3  = Platform(Xlist[3], 1241, -1, KidImg.Board)
+#Board2  = Platform(Xlist[3], 1241, -1, KidImg.Board )
+#Board3  = Platform(Xlist[3], 1241, -1, KidImg.Board)
 Trampoline  = Platform(Xlist[6], 1241, -1, KidImg.TrampolineUP)
 ceil = Platform(20, 80, 0,  KidImg.ceil )
 conveyor_left = Platform(Xlist[5], 1241, -1,  KidImg.conveyor_left)
@@ -470,7 +470,7 @@ timeflag = 0
 timebios = []
 run = True
 '''
-
+'''
 while run:
     
     ##環境設定

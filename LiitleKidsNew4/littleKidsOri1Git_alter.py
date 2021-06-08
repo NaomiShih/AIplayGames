@@ -256,7 +256,7 @@ class GameState(player, Platform):
         self.HPJudge = [True]
         
         self.player1 = player(240, 120, 10,KidImg.player, 0.5 )
-        
+    
         for i in range(0, 100, 1):           
             X = random.randint(30, 365)
             Xlist.append(X)
@@ -290,12 +290,18 @@ class GameState(player, Platform):
         # input_actions[0] == 1: do nothing
         # input_actions[1] == 1: left
         # input_actions[2] == 1: right
-        if input_actions[1] == 1:
+        
+        if input_actions[0] == 1:
+            self.player1.img = KidImg.player
+        
+        elif input_actions[1] == 1:
             self.player1.X -= self.player1.vel
-            
+            self.player1.img = walkLeft[self.walkCount % 2]
+            self.walkCount += 1
         elif input_actions[2] == 1:
             self.player1.X += self.player1.vel
-            
+            self.player1.img = walkRight[self.walkCount % 2]
+            self.walkCount += 1
         platformtime = pygame.time.get_ticks()#設定一個計時器 單位為毫秒
         times = platformtime % 2500#計時器每2.5秒歸0
         

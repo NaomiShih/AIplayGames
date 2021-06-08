@@ -95,7 +95,7 @@ class player:
             player.Y -= 1.5
         else:
             player.Y -= 1.8
-    def player_stop_float(player,HPJudge):
+    def player_stop_float(player,CountF,HPJudge):
         player.Y += 11
         HPJudge[0]=True
         if HPJudge[0]:
@@ -109,7 +109,7 @@ class player:
             jump = 0
         
         elif player.Y < 115:
-            player.player_stop_float(player,HPJudge)
+            player.player_stop_float(player,CountF,HPJudge)
             jump = 0
             
             
@@ -188,7 +188,7 @@ class Platform:
         PlatformRect  = pygame.Rect(Platform.X, Platform.Y , PlatWidth, PlatHigth)
         PlayerRect    = pygame.Rect(Player.X, Player.Y, PlayerWidth, PlayerHight)
         if (pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1 and Platform.img == KidImg.ceil):
-            player.player_stop_float(Player,HPJudge)
+            player.player_stop_float(Player,CountF,HPJudge)
             
         
         elif (pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1)and(Platform.img == KidImg.TrampolineUP):
@@ -284,7 +284,8 @@ class GameState(player, Platform):
         terminal = False
 
         if sum(input_actions) != 1:
-            raise ValueError('Multiple input actions!')
+            pass
+            #raise ValueError('Multiple input actions!')
 
         # input_actions[0] == 1: do nothing
         # input_actions[1] == 1: left

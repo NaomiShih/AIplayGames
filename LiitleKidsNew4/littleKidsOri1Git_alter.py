@@ -95,7 +95,7 @@ class player:
             player.Y -= 1.5
         else:
             player.Y -= 1.8
-    def player_stop_float(player):
+    def player_stop_float(player,HPJudge):
         player.Y += 11
         HPJudge[0]=True
         if HPJudge[0]:
@@ -103,13 +103,13 @@ class player:
 
             
     
-    def player_jump(player, CountF):
+    def player_jump(player, CountF,HPJudge):
         global jump,PY
         if player.Y < (PY-130):
             jump = 0
         
         elif player.Y < 115:
-            player.player_stop_float()
+            player.player_stop_float(player,HPJudge)
             jump = 0
             
             
@@ -184,11 +184,11 @@ class Platform:
         player.X += player.vel/2
     def Platform_left(self, player):
         player.X -= player.vel/2
-    def Platform_Rect(Platform, Player, PlatWidth, PlatHigth, PlayerWidth, PlayerHight, CountF):
+    def Platform_Rect(Platform, Player, PlatWidth, PlatHigth, PlayerWidth, PlayerHight, CountF, HPJudge):
         PlatformRect  = pygame.Rect(Platform.X, Platform.Y , PlatWidth, PlatHigth)
         PlayerRect    = pygame.Rect(Player.X, Player.Y, PlayerWidth, PlayerHight)
         if (pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1 and Platform.img == KidImg.ceil):
-            player.player_stop_float(Player)
+            player.player_stop_float(Player,HPJudge)
             
         
         elif (pygame.Rect.colliderect(PlayerRect, PlatformRect) == 1)and(Platform.img == KidImg.TrampolineUP):
@@ -307,11 +307,11 @@ class GameState(player, Platform):
             terminal = True
             self.__init__()
             reward = -5
-        
+        '''
         if (self.loopIter + 1) % 3 == 0:
             self.playerIndex = next(PLAYER_INDEX_GEN)
         self.loopIter = (self.loopIter + 1) % 30
-        
+        '''
         head_font = pygame.font.SysFont(None, 60)#設定大小60的標題框框
         text_surface = head_font.render('B%04dF'%self.CountF, True, (121, 255, 121))#設定標題的字跟顏色
         screen.blit(text_surface, (300, 25))#讓標題印在畫布300,25的地方
@@ -353,13 +353,13 @@ class GameState(player, Platform):
             self.__init__()
     
         if jump == 1:
-            player.player_jump(self.player1, self.CountF)
+            player.player_jump(self.player1, self.CountF,self.HPJudge)
         
         else:
             player.player_fall(self.player1)
    
         playerRect  = pygame.Rect(self.player1.X, self.player1.Y, 31, 31)#畫出PLAYER1的碰撞範圍
-        Platform.Platform_Rect(self.ceil, self.player1, 480, 32, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.ceil, self.player1, 480, 32, 31, 31, self.CountF,self.HPJudge)
  
         WallRect  = pygame.Rect(0, 80, 18, 560)
         WallRect2  = pygame.Rect(450, 80, 18, 560)
@@ -380,34 +380,34 @@ class GameState(player, Platform):
 
         
         Platform.SetPlatform(0 , platformtime,self.Board1, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
-        Platform.Platform_Rect(self.Board1, self.player1, 94, 1, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.Board1, self.player1, 94, 1, 31, 31, self.CountF,self.HPJudge)
         
         Platform.SetPlatform(1900 , platformtime,self.Trampoline, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)#設定彈簧
-        Platform.Platform_Rect(self.Trampoline, self.player1, 95, 1, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.Trampoline, self.player1, 95, 1, 31, 31, self.CountF,self.HPJudge)
         Platform.SetPlatform(500, platformtime, self.conveyor_left, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
-        Platform.Platform_Rect(self.conveyor_left, self.player1, 95, 1, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.conveyor_left, self.player1, 95, 1, 31, 31, self.CountF,self.HPJudge)
         Platform.SetPlatform(1200 , platformtime,self.Board2 , self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
-        Platform.Platform_Rect(self.Board2, self.player1, 94, 1, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.Board2, self.player1, 94, 1, 31, 31, self.CountF,self.HPJudge)
         
         Platform.SetPlatform(2400 , platformtime,self.Board3 , self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
-        Platform.Platform_Rect(self.Board3, self.player1, 94, 1, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.Board3, self.player1, 94, 1, 31, 31, self.CountF,self.HPJudge)
     
         Platform.SetPlatform(1500 , platformtime,self.Nails1, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right )
-        Platform.Platform_Rect(self.Nails1, self.player1, 95, 1, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.Nails1, self.player1, 95, 1, 31, 31, self.CountF,self.HPJudge)
         
         Platform.SetPlatform(timerand + timebios[4], platformtime, self.conveyor_right, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
-        Platform.Platform_Rect(self.conveyor_right, self.player1, 95, 1, 31, 31, self.CountF)
+        Platform.Platform_Rect(self.conveyor_right, self.player1, 95, 1, 31, 31, self.CountF,self.HPJudge)
         if (self.CountF > 20):
              Platform.SetPlatform(timerand + timebios[5] , platformtime,self.Nails2 , self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right)
-             Platform.Platform_Rect(self.Nails2, self.player1, 95, 1, 31, 31, self.CountF)
+             Platform.Platform_Rect(self.Nails2, self.player1, 95, 1, 31, 31, self.CountF,self.HPJudge)
         if (self.CountF > 30):
     
              Platform.SetPlatform(timerand + timebios[6] , platformtime,self.Nails3, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right )
-             Platform.Platform_Rect(self.Nails3, self.player1, 95, 1, 31, 31, self.CountF)     
+             Platform.Platform_Rect(self.Nails3, self.player1, 95, 1, 31, 31, self.CountF,self.HPJudge)     
         if (self.CountF > 50):
     
              Platform.SetPlatform(timerand + timebios[7] , platformtime,self.Nails4, self.CountF,self.Board1,self.Board2,self.Board3,self.Nails1,self.Nails2,self.Nails3,self.Nails4,self.Trampoline,self.conveyor_left,self.conveyor_right )
-             Platform.Platform_Rect(self.Nails4, self.player1, 95, 1, 31, 31, self.CountF)
+             Platform.Platform_Rect(self.Nails4, self.player1, 95, 1, 31, 31, self.CountF,self.HPJudge)
              
         
         PlayerRect    = pygame.Rect(self.player1.X, self.player1.Y, 31, 31)
@@ -445,11 +445,11 @@ class GameState(player, Platform):
 
      
     
-
+'''
 for i in range(0, 100, 1):           
     X = random.randint(30, 365)
     Xlist.append(X)
-'''
+
 player1 = player(240, 120, 10,KidImg.player, 0.5 )
 
 
@@ -469,8 +469,8 @@ conveyor_right = Platform(Xlist[6], 1241, -1,  KidImg.conveyor_right )
 timeflag = 0
 timebios = []
 run = True
-'''
-'''
+
+
 while run:
     
     ##環境設定

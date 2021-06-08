@@ -27,12 +27,13 @@ import math
 import os
 from keras.models import load_model
 import keras.losses
+import pygame
 
 
 ACTIONS = 3 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
 OBSERVE = 50000. # timesteps to observe before training
-EXPLORE = 2000000. # frames over which to anneal epsilon
+EXPLORE = 0.9 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.1 # final value of epsilon
 INITIAL_EPSILON = 0.0001 # starting value of epsilon
 REPLAY_MEMORY = 50000 # number of previous transitions to remember
@@ -90,89 +91,93 @@ def network():
 	return model
 
 def train():
-	B = int(input('Press 0 if you want to train from start or 1 if you want to test : '))
-	model = network()
-	if B==1:
-		model.load_weights("trained_model/dell-4410000.h5")
-	D = deque()
-	epsilon = INITIAL_EPSILON
-	game_state = game.GameState()
+    B = int(input('Press 0 if you want to train from start or 1 if you want to test : '))
+    model = network()
+    if B==1:
+        model.load_weights("trained_model/dell-4410000.h5")
+    D = deque()
+    epsilon = INITIAL_EPSILON
+    game_state = game.GameState()
 
-	dummy_a = np.zeros(ACTIONS)
-	dummy_a[0] = 1
+    dummy_a = np.zeros(ACTIONS)
+    dummy_a[0] = 1
 
-	x_tc, r_t, T_t = game_state.frame_step(dummy_a)
-	x_t = image_preprocess(x_tc)
-	x_tt = x_t
-	t = 0
-	while 1:
-		t += 1
+    x_tc, r_t, T_t = game_state.frame_step(dummy_a)
+    x_t = image_preprocess(x_tc)
+    x_tt = x_t
+    t = 0
+    while 1:
+        t += 1
 		
-		x_t = np.asarray([x_tt])
-		a_t = np.zeros([ACTIONS])
-		dummy_a = np.asarray([a_t])
-		dummy_y = np.asarray([[0.0]])
-		action_index = 0
+        x_t = np.asarray([x_tt])
+        a_t = np.zeros([ACTIONS])
+        dummy_a = np.asarray([a_t])
+        dummy_y = np.asarray([[0.0]])
+        action_index = 0
 		
-		Q_t = model.predict([x_t,dummy_a,dummy_y])[0]  ## Model prediction using current image
+        Q_t = model.predict([x_t,dummy_a,dummy_y])[0]  ## Model prediction using current image
 		
 		## Choosing action
 
-		if random.random() <= epsilon:
-			print("RANDOM step")
-			action_index = random.randrange(ACTIONS)
-		else:
-			action_index = np.argmax(Q_t)
-		a_t[action_index] = 1
+        if random.random() <= epsilon:
+            print("RANDOM step")
+            action_index = random.randrange(ACTIONS)
+        else:
+            action_index = np.argmax(Q_t)
+            a_t[action_index] = 1
 
-		if epsilon > FINAL_EPSILON and t > OBSERVE:
-			epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
+        if epsilon > FINAL_EPSILON and t > OBSERVE:
+            epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
 
-		x_tc, r_t, T_t = game_state.frame_step(a_t)
+        x_tc, r_t, T_t = game_state.frame_step(a_t)
 		
-		x_tn = image_preprocess(x_tc)
-		D.append((x_tt, a_t, r_t, x_tn, T_t))	# Maintaining replay memory
+        x_tn = image_preprocess(x_tc)
+        D.append((x_tt, a_t, r_t, x_tn, T_t))	# Maintaining replay memory
 		
-		x_tt = x_tn
+        x_tt = x_tn
 
-		if len(D) > REPLAY_MEMORY:
-			D.popleft()
+        if len(D) > REPLAY_MEMORY:
+            D.popleft()
 
-		if B != 1:
-			if t % 25000 == 0:
-				model.save_weights('trained_model/' + 'dqn' + str(t)+'.h5')
-				print("Time : ", t)
+        if B != 1:
+            if t % 25000 == 0:
+                model.save_weights('trained_model/' + 'dqn' + str(t)+'.h5')
+                print("Time : ", t)
 
 
-			if t > OBSERVE:
+            if t > OBSERVE:
 
 				## Sampling mini batch at random to train 
 				
-				minibatch = random.sample(D, BATCH)
+                minibatch = random.sample(D, BATCH)
 
-				s_t_batch = np.asarray([d[0] for d in minibatch])
-				a_batch = np.asarray([d[1] for d in minibatch])
-				r_batch = np.asarray([d[2] for d in minibatch])
-				s_tn_batch = np.asarray([d[3] for d in minibatch])
-				t_batch = [d[4] for d in minibatch]
+                s_t_batch = np.asarray([d[0] for d in minibatch])
+                a_batch = np.asarray([d[1] for d in minibatch])
+                r_batch = np.asarray([d[2] for d in minibatch])
+                s_tn_batch = np.asarray([d[3] for d in minibatch])
+                t_batch = [d[4] for d in minibatch]
 
-				y_batch = np.zeros(BATCH)
-				y_batch_dummy = np.zeros(BATCH)
-				Q_tn_batch = model.predict_on_batch([s_tn_batch,a_batch,y_batch_dummy])
-				for i in range(0, len(minibatch)):
-					if t_batch[i]:
+                y_batch = np.zeros(BATCH)   
+                y_batch_dummy = np.zeros(BATCH)
+                Q_tn_batch = model.predict_on_batch([s_tn_batch,a_batch,y_batch_dummy])
+                for i in range(0, len(minibatch)):
+                    if t_batch[i]:
 						#print("terminal", r_batch[i])
-						y_batch[i] = r_batch[i]
-					else:
-						y_batch[i] = r_batch[i] + GAMMA * np.max(Q_tn_batch[i])
+                        y_batch[i] = r_batch[i]
+                    else:
+                        y_batch[i] = r_batch[i] + GAMMA * np.max(Q_tn_batch[i])
 				#print(y_batch)
 				#break
-				model.fit(x=[s_t_batch,a_batch,y_batch], y=y_batch,batch_size=32,verbose=0)
+                model.fit(x=[s_t_batch,a_batch,y_batch], y=y_batch,batch_size=32,verbose=0)
 
-		print("T:", t ,"| EPS:", epsilon, "| A", action_index, "| R", r_t, "| Q ", Q_t)
+        print("T:", t ,"| EPS:", epsilon, "| A", action_index, "| R", r_t, "| Q ", Q_t)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:#如果有按到離開視窗則停止執行while 就會執行到
+                pygame.quit()
 
 def main():
 	train()
 
 if __name__ == "__main__":
-	main()
+    main()
+    

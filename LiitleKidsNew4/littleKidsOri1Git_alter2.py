@@ -447,9 +447,12 @@ class GameState(player, Platform):
         #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
         if not(a or b or c or d or e or f or g or h or i or j):
             self.HPJudge[0] = True
-            reward=-0.3
+        
         elif k or g or h or i or j:
-            reward=-1
+            reward=-0.3
+        
+        else:
+            reward=0.2
         
         
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())

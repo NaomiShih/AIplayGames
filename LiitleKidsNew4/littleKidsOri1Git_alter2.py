@@ -282,7 +282,7 @@ class GameState(player, Platform):
         timebios = []
         reward = 0.1
         terminal = False
-
+        MaxCF = self.CountF
         if sum(input_actions) != 1:
             pass
             #raise ValueError('Multiple input actions!')
@@ -308,11 +308,13 @@ class GameState(player, Platform):
         
         if times < 3 and self.player1.Y <= 640:
             self.CountF += 1
+            MaxCF = self.CountF
     
     
         elif self.player1.Y >= 640:
             playsound('./assets/sounds/Fall 2.mp3', block=True)
             terminal = True
+            MaxCF=self.CountF
             self.__init__()
             reward = -2
         '''
@@ -354,17 +356,18 @@ class GameState(player, Platform):
             screen.blit( KidImg.life8,  (10, 0))
         elif self.player1.HP == 1:
             screen.blit( KidImg.life9,  (10, 0))
-            reward = -1
+            reward = -1.5
         elif self.player1.HP <= 0:
             screen.blit( KidImg.life10,  (10, 0))
             playsound('./assets/sounds/Stabbed Scream.mp3', block=True)
-            Terminal = True
+            terminal = True
+            MaxCF=self.CountF
             self.__init__()
             reward = -2
     
         if jump == 1:
             player.player_jump(self.player1, self.CountF,self.HPJudge)
-            reward = 0.5
+            reward = 0.7
         
         else:
             player.player_fall(self.player1)
@@ -447,18 +450,19 @@ class GameState(player, Platform):
         #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
         if not(a or b or c or d or e or f or g or h or i or j):
             self.HPJudge[0] = True
-        
-        elif k or g or h or i or j:
-            reward=-0.3
-        
+            
+        elif (g or h or i or j) and (self.HPJudge[0]==True):
+            reward=-1.2
+        elif k and (self.HPJudge[0]==True):
+            reward=-0.8
         else:
-            reward=0.2
+            reward=0.5
         
         
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-        return image_data, reward, terminal, self.CountF
+        return image_data, reward, terminal, MaxCF
 
      
     
@@ -466,7 +470,10 @@ class GameState(player, Platform):
 for i in range(0, 100, 1):           
     X = random.randint(30, 365)
     Xlist.append(X)
+
 player1 = player(240, 120, 10,KidImg.player, 0.5 )
+
+
 #Board1  = Platform(240, 600, -1, KidImg.Board)
 #Nails1   = Platform(Xlist[4], 1241, 3,KidImg.Nails )
 #Nails2   = Platform(Xlist[2], 1241, 3,KidImg.Nails )
@@ -478,18 +485,24 @@ Trampoline  = Platform(Xlist[6], 1241, -1, KidImg.TrampolineUP)
 ceil = Platform(20, 80, 0,  KidImg.ceil )
 conveyor_left = Platform(Xlist[5], 1241, -1,  KidImg.conveyor_left)
 conveyor_right = Platform(Xlist[6], 1241, -1,  KidImg.conveyor_right )
+
+
 timeflag = 0
 timebios = []
 run = True
+
+
 while run:
     
     ##環境設定
     
     screen.fill((0, 0, 0))#把畫布塗黑
+
     
     platformtime = pygame.time.get_ticks()#設定一個計時器 單位為毫秒
     times = platformtime % 2500#計時器每2.5秒歸0
     
+
     if times < 3 and player1.Y <= 640:
         CountF += 1
     
@@ -549,6 +562,7 @@ while run:
  
     WallRect  = pygame.Rect(0, 80, 18, 560)
     WallRect2  = pygame.Rect(450, 80, 18, 560)
+
     
     if (pygame.Rect.colliderect(playerRect, WallRect) == 1 ):
          player1.X  = 18
@@ -563,6 +577,7 @@ while run:
             timebiosrand = random.randint(500, 1500 )
             timebios.append(timebiosrand)
         timeflag = 1
+
     Platform.SetPlatform(0 , platformtime,Board1, CountF)
     Platform.Platform_Rect(Board1, player1, 94, 1, 31, 31, CountF)
     
@@ -575,6 +590,7 @@ while run:
     
     Platform.SetPlatform(2400 , platformtime,Board3 , CountF)
     Platform.Platform_Rect(Board3, player1, 94, 1, 31, 31, CountF)
+
     Platform.SetPlatform(1500 , platformtime,Nails1, CountF )
     Platform.Platform_Rect(Nails1, player1, 95, 1, 31, 31, CountF)
     
@@ -584,9 +600,11 @@ while run:
          Platform.SetPlatform(timerand + timebios[5] , platformtime,Nails2 , CountF)
          Platform.Platform_Rect(Nails2, player1, 95, 1, 31, 31, CountF)
     if (CountF > 30):
+
          Platform.SetPlatform(timerand + timebios[6] , platformtime,Nails3, CountF )
          Platform.Platform_Rect(Nails3, player1, 95, 1, 31, 31, CountF)     
     if (CountF > 50):
+
          Platform.SetPlatform(timerand + timebios[7] , platformtime,Nails4, CountF )
          Platform.Platform_Rect(Nails4, player1, 95, 1, 31, 31, CountF)
          
@@ -619,14 +637,19 @@ while run:
         HPJudge[0] = True
   
     pygame.display.flip()#環境更新尖刺2{h} 尖刺3{i}
+
          
   
+
+
     #操控角色    
     for event in pygame.event.get():
            
         if event.type == pygame.QUIT:#如果有按到離開視窗則停止執行while 就會執行到關閉
             run = False
     walkCount = player.player_move(walkCount, player1)
+
+
 pygame.quit()
 '''
     #playerImg = pygame.image.load('C:\\Users\\USER\\PythonGame\\LittleKids\\assets\\playerNomal.png')  

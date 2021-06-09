@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jun  2 21:47:44 2021
-
 @author: Hanyu
 """
 
@@ -97,7 +96,7 @@ def train():
     B = int(input('Press 0 if you want to train from start, 1 if you want to test or 2 if you want to load pre-train model  : '))
     model = network()
     if B==1:
-        model.load_weights("trained_model/dqn125000.h5")
+        model.load_weights("trained_model/predqn50000.h5")
     elif B==2:
         model.load_weights("trained_model/dqn125000.h5")
     D = deque()
@@ -107,11 +106,12 @@ def train():
     dummy_a = np.zeros(ACTIONS)
     dummy_a[0] = 1
 
-    x_tc, r_t, T_t = game_state.frame_step(dummy_a)
+    x_tc, r_t, T_t, CountF = game_state.frame_step(dummy_a)
     x_t = image_preprocess(x_tc)
     x_tt = x_t
     t = 0
     dead=0
+    best = 0
     while 1:
         t += 1
 		
@@ -135,9 +135,14 @@ def train():
         if epsilon > FINAL_EPSILON and t > OBSERVE:
             epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
 
-        x_tc, r_t, T_t = game_state.frame_step(a_t)
+        x_tc, r_t, T_t , CountF= game_state.frame_step(a_t)
+    
+        if  CountF > best:
+                best = CountF
         if T_t==True:
             dead+=1
+           
+        
         x_tn = image_preprocess(x_tc)
         D.append((x_tt, a_t, r_t, x_tn, T_t))	# Maintaining replay memory
 		
@@ -176,8 +181,8 @@ def train():
 				#print(y_batch)
 				#break
                 model.fit(x=[s_t_batch,a_batch,y_batch], y=y_batch,batch_size=32,verbose=0)
-
-        print("T:", t ,"| 死亡:", dead,"| EPS:", epsilon, "| A", action_index, "| R", r_t, "| Q ", Q_t)
+        
+        print("T:", t ,"| 死亡:", dead,"| EPS:", epsilon, "| A", action_index, "| R", r_t, "| Q ", Q_t, '最高紀錄', best, 'F')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:#如果有按到離開視窗則停止執行while 就會執行到
                 pygame.quit()
@@ -186,5 +191,3 @@ def main():
 	train()
 
 if __name__ == "__main__":
-    main()
-    

@@ -453,7 +453,7 @@ class GameState(player, Platform):
             
         elif (g or h or i or j) and (self.HPJudge[0]==True):
             reward=-1.2
-        elif k and (self.HPJudge[0]==True):
+        elif k:
             reward=-0.8
         else:
             reward=0.5

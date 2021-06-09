@@ -314,7 +314,7 @@ class GameState(player, Platform):
             playsound('./assets/sounds/Fall 2.mp3', block=True)
             terminal = True
             self.__init__()
-            reward = -5
+            reward = -2
         '''
         if (self.loopIter + 1) % 3 == 0:
             self.playerIndex = next(PLAYER_INDEX_GEN)
@@ -354,14 +354,17 @@ class GameState(player, Platform):
             screen.blit( KidImg.life8,  (10, 0))
         elif self.player1.HP == 1:
             screen.blit( KidImg.life9,  (10, 0))
+            reward = -1
         elif self.player1.HP <= 0:
             screen.blit( KidImg.life10,  (10, 0))
             playsound('./assets/sounds/Stabbed Scream.mp3', block=True)
             Terminal = True
             self.__init__()
+            reward = -2
     
         if jump == 1:
             player.player_jump(self.player1, self.CountF,self.HPJudge)
+            reward = 0.5
         
         else:
             player.player_fall(self.player1)
@@ -444,6 +447,9 @@ class GameState(player, Platform):
         #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
         if not(a or b or c or d or e or f or g or h or i or j):
             self.HPJudge[0] = True
+            reward=-0.3
+        elif k or g or h or i or j:
+            reward=-1
         
         
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())

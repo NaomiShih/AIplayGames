@@ -254,7 +254,7 @@ class GameState(player, Platform):
         self.CountF = 0     
         self.walkCount = 0
         self.HPJudge = [True]
-        
+        self.totalY = 0
         self.player1 = player(240, 120, 10,KidImg.player, 0.5 )
         
         for i in range(0, 100, 1):           
@@ -280,7 +280,7 @@ class GameState(player, Platform):
         
         screen.fill((0, 0, 0))
         timebios = []
-        reward = 0.1
+        reward = 0.01
         terminal = False
         MaxCF = self.CountF
         if sum(input_actions) != 1:
@@ -306,22 +306,23 @@ class GameState(player, Platform):
         platformtime = pygame.time.get_ticks()#設定一個計時器 單位為毫秒
         times = platformtime % 2500#計時器每2.5秒歸0
         
-        if times < 3 and self.player1.Y <= 640:
+        #if times < 3 and self.player1.Y <= 640:
+        if self.totalY % 100 ==0:
             self.CountF += 1
             MaxCF = self.CountF
+            
+        elif (355 >self.player1.Y > 155) and (300>self.player1.X>180):
+            reward = 0.05
     
     
         elif self.player1.Y >= 640:
             playsound('./assets/sounds/Fall 2.mp3', block=True)
+            
             terminal = True
             MaxCF=self.CountF
             self.__init__()
-            reward = -2
-        '''
-        if (self.loopIter + 1) % 3 == 0:
-            self.playerIndex = next(PLAYER_INDEX_GEN)
-        self.loopIter = (self.loopIter + 1) % 30
-        '''
+            reward = -1
+        
         head_font = pygame.font.SysFont(None, 60)#設定大小60的標題框框
         text_surface = head_font.render('B%04dF'%self.CountF, True, (121, 255, 121))#設定標題的字跟顏色
         screen.blit(text_surface, (300, 25))#讓標題印在畫布300,25的地方
@@ -356,18 +357,18 @@ class GameState(player, Platform):
             screen.blit( KidImg.life8,  (10, 0))
         elif self.player1.HP == 1:
             screen.blit( KidImg.life9,  (10, 0))
-            reward = -1.5
+            reward = -0.8
         elif self.player1.HP <= 0:
             screen.blit( KidImg.life10,  (10, 0))
             playsound('./assets/sounds/Stabbed Scream.mp3', block=True)
             terminal = True
             MaxCF=self.CountF
             self.__init__()
-            reward = -2
+            reward = -1
     
         if jump == 1:
             player.player_jump(self.player1, self.CountF,self.HPJudge)
-            reward = 0.7
+            reward = 0.1
         
         else:
             player.player_fall(self.player1)
@@ -450,13 +451,15 @@ class GameState(player, Platform):
         #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
         if not(a or b or c or d or e or f or g or h or i or j):
             self.HPJudge[0] = True
+            if jump == 0:
+                self.totalY+=self.player1.vel
             
         elif (g or h or i or j) and (self.HPJudge[0]==True):
-            reward=-1.2
-        elif k:
-            reward=-0.8
+            reward=-0.7
+        elif k :
+            reward=-0.5
         else:
-            reward=0.5
+            reward=0.1
         
         
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())

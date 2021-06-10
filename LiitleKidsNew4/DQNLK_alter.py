@@ -28,18 +28,20 @@ import os
 from keras.models import load_model
 import keras.losses
 import pygame
+import matplotlib.pyplot as plt
+
 #from tensorflow.python.framework.ops import disable_eager_execution
 #from tensorflow import keras
 #disable_eager_execution()
 
 
 ACTIONS = 3 # number of valid actions
-GAMMA = 0.99 # decay rate of past observations
+GAMMA = 0.95 # decay rate of past observations
 OBSERVE = 25000. # timesteps to observe before training
 EXPLORE = 1000000 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.001 # final value of epsilon
-INITIAL_EPSILON = 0.45 # starting value of epsilon
-REPLAY_MEMORY = 100000 # number of previous transitions to remember
+INITIAL_EPSILON = 0.35 # starting value of epsilon
+REPLAY_MEMORY = 200000 # number of previous transitions to remember
 BATCH = 32 # minibatch size
 lencf = 20
 
@@ -98,12 +100,16 @@ def train():
     B = int(input('Press 0 if you want to train from start, 1 if you want to test or 2 if you want to load pre-train model  : '))
     model = network()
     if B==1:
-        model.load_weights("trained_model/predqn350000.h5")
+        model.load_weights("trained_model/predqn125000.h5")
     elif B==2:
-        model.load_weights("trained_model/predqn350000.h5")
+        model.load_weights("trained_model/predqn125000.h5")
     D = deque()
     CF = deque()
     CF.append(0)
+
+    loss = deque()
+    timest = deque()
+
     epsilon = INITIAL_EPSILON
     game_state = game.GameState()
 
@@ -147,10 +153,11 @@ def train():
             dead+=1
             CF.append(CountF)
         x_tn = image_preprocess(x_tc)
-        cv2.imshow('return from state',x_tc)
-        cv2.imshow('preprocess',x_tn)
         D.append((x_tt, a_t, r_t, x_tn, T_t))	# Maintaining replay memory
         x_tt = x_tn
+
+        #cv2.imshow('return from state',x_tc)
+        #cv2.imshow('preprocess',x_tn)
 
         if len(CF)>lencf:
             CF.popleft()
@@ -161,6 +168,10 @@ def train():
         if B != 1:
             if t % 25000 == 0:
                 model.save_weights('trained_model/' + 'predqn' + str(t)+'.h5')
+                print("Time : ", t)
+                
+            elif (sum(list(CF))/len(list(CF)))>7:
+                model.save_weights('trained_model/' + 'mean7dqn' + str(t)+'.h5')
                 print("Time : ", t)
 
 
@@ -187,7 +198,17 @@ def train():
                         y_batch[i] = r_batch[i] + GAMMA * np.max(Q_tn_batch[i])
 				#print(y_batch)
 				#break
-                model.fit(x=[s_t_batch,a_batch,y_batch], y=y_batch,batch_size=32,verbose=0)
+                history=model.fit(x=[s_t_batch,a_batch,y_batch], y=y_batch,batch_size=32,verbose=0)
+
+                timest.append(t)
+                loss.append(history.history['loss'][0])
+                if t % 10000 == 0:
+                    plt.plot(list(timest),list(loss),'r-')
+                    plt.title('model loss')
+                    plt.ylabel('loss')
+                    plt.xlabel('timestep')
+                    plt.legend(['loss', 'test'], loc='upper left')
+                    plt.show()
 
         print("T:", t ,"| 死亡:", dead,"| EPS:", epsilon, "| A", action_index, "| R", r_t, "| Q ", Q_t, '|最高紀錄', best, 'F')
         print("近20次最高分:", max(list(CF)) ,"| 平均:", sum(list(CF))/len(list(CF)))

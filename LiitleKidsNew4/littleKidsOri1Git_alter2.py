@@ -306,12 +306,9 @@ class GameState(player, Platform):
         platformtime = pygame.time.get_ticks()#設定一個計時器 單位為毫秒
         times = platformtime % 2500#計時器每2.5秒歸0
         
-        #if times < 3 and self.player1.Y <= 640:
-        if self.totalY % 100 ==0:
-            self.CountF += 1
-            MaxCF = self.CountF
+        #if times < 3 and self.player1.Y <= 640
             
-        elif (355 >self.player1.Y > 155) and (300>self.player1.X>180):
+        if (355 >self.player1.Y > 155) and (300>self.player1.X>180):
             reward = 0.05
     
     
@@ -451,6 +448,9 @@ class GameState(player, Platform):
         #print(f'板子1:{a} 板子2:{b} 板子3:{c} 彈簧:{d} 輸送帶左:{e} 輸送帶右:{f} 尖刺1:{g} 尖刺2:{h} 尖刺3:{i} 尖刺4:{j} 上面尖刺{k} ' )
         if not(a or b or c or d or e or f or g or h or i or j):
             self.HPJudge[0] = True
+            if self.totalY%100==0:
+                self.CountF+=1
+                MaxCF = self.CountF
             if jump == 0:
                 self.totalY+=self.player1.vel
             

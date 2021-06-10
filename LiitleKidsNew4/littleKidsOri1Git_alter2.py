@@ -450,7 +450,7 @@ class GameState(player, Platform):
             self.HPJudge[0] = True
             if self.totalY%100==0:
                 self.CountF+=1
-                MaxCF = self.CountF
+                
             if jump == 0:
                 self.totalY+=self.player1.vel
             

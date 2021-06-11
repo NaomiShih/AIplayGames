@@ -38,9 +38,9 @@ import matplotlib.pyplot as plt
 ACTIONS = 3 # number of valid actions
 GAMMA = 0.95 # decay rate of past observations
 OBSERVE = 25000. # timesteps to observe before training
-EXPLORE = 1000000 # frames over which to anneal epsilon
+EXPLORE = 0.75 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.001 # final value of epsilon
-INITIAL_EPSILON = 0.35 # starting value of epsilon
+INITIAL_EPSILON = 0.85 # starting value of epsilon
 REPLAY_MEMORY = 200000 # number of previous transitions to remember
 BATCH = 32 # minibatch size
 lencf = 20
@@ -100,9 +100,9 @@ def train():
     B = int(input('Press 0 if you want to train from start, 1 if you want to test or 2 if you want to load pre-train model  : '))
     model = network()
     if B==1:
-        model.load_weights("trained_model/predqn125000.h5")
+        model.load_weights("trained_model/dqn125000.h5")
     elif B==2:
-        model.load_weights("trained_model/predqn125000.h5")
+        model.load_weights("trained_model/dqn125000.h5")
     D = deque()
     CF = deque()
     CF.append(0)
@@ -167,7 +167,7 @@ def train():
 
         if B != 1:
             if t % 25000 == 0:
-                model.save_weights('trained_model/' + 'predqn' + str(t)+'.h5')
+                model.save_weights('trained_model/' + 'predqnsec' + str(t)+'.h5')
                 print("Time : ", t)
                 
             elif (sum(list(CF))/len(list(CF)))>7:
